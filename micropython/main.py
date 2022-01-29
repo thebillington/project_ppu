@@ -3,17 +3,28 @@ from simulated_hardware import Device
 from colour import Colour
 from physics import Rectangle
 
-device = Device()
+device = Device(width=480, height=320, bgcolour=Colour(0x00))
 
-player = Rectangle(0, 0, 20, 20, Colour(0x04))
-enemy = Rectangle(30, 30, 20, 20, Colour(0x0F))
+paddle_one = Rectangle(10, 140, 5, 40, Colour(0x07))
+paddle_two = Rectangle(455, 140, 5, 40, Colour(0x07))
 
 while True:
+
+    if device.is_pressed("w"):
+        paddle_one.y -= 1
+    if device.is_pressed("s"):
+        paddle_one.y += 1
+
+    if device.is_pressed("Up"):
+        paddle_two.y -= 1
+    if device.is_pressed("Down"):
+        paddle_two.y += 1
     
-    device.screen.clear()
+    device.clear()
 
-    device.screen.renderRectangle(player)
-    device.screen.renderRectangle(enemy)
+    device.renderRectangle(paddle_one)
+    device.renderRectangle(paddle_two)
 
-    device.screen.update()
-    sleep(0.1)
+    device.update()
+
+    sleep(1/60)
