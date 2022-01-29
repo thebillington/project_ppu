@@ -4,8 +4,8 @@ from colour import Colour
 import keyboard
 
 class Device:
-    def __init__(self, width=480, height=320, bgcolour=Colour(0x00)):
-        self.screen = Screen(width, height, bgcolour)
+    def __init__(self, bgcolour=Colour(0x00)):
+        self.screen = Screen(480, 320, bgcolour)
 
     def clear(self):
         self.screen.clear()
@@ -13,8 +13,8 @@ class Device:
     def update(self):
         self.screen.update()
     
-    def renderRectangle(self, rect):
-        self.screen.renderRectangle(rect)
+    def draw_rect(self, rect):
+        self.screen.draw_rect(rect)
     
     def is_pressed(self, k):
         return keyboard.is_pressed(k)
@@ -30,20 +30,20 @@ class Screen:
             self.window,
             width=width,
             height=height,
-            bg=bgcolour.getHexString(),
+            bg=bgcolour.get_hex(),
             highlightthickness=0
         )
 
         self.canvas.pack()
     
-    def renderRectangle(self, rect):
+    def draw_rect(self, rect):
         self.canvas.create_rectangle(
             rect.x,
             rect.y,
             rect.x + rect.width,
             rect.y + rect.height,
-            fill=rect.colour.getHexString(),
-            outline=rect.colour.getHexString()
+            fill=rect.colour.get_hex(),
+            outline=rect.colour.get_hex()
         )
 
     def update(self):

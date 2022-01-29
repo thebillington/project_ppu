@@ -13,15 +13,11 @@ LCD_RST  = 15
 TP_CS    = 16
 TP_IRQ   = 17
 
-class LCD_3inch5(framebuf.FrameBuffer):
+class Device(framebuf.FrameBuffer):
 
-    def __init__(self):
-        self.RED   =   0x07E0
-        self.GREEN =   0x001f
-        self.BLUE  =   0xf800
-        self.WHITE =   0xffff
-        self.BLACK =   0x0000
-        
+    def __init__(self, bgcolour):
+        self.bgcolour = bgcolour
+
         self.width = 480
         self.height = 160
         
@@ -37,11 +33,14 @@ class LCD_3inch5(framebuf.FrameBuffer):
         self.rst(1)
         self.tp_cs(1)
         self.spi = SPI(1,60_000_000,sck=Pin(LCD_SCK),mosi=Pin(LCD_MOSI),miso=Pin(LCD_MISO))
+
+        self.rect_buffer = []
               
         self.buffer = bytearray(self.height * self.width * 2)
         super().__init__(self.buffer, self.width, self.height, framebuf.RGB565)
-        self.init_display()
 
+        self.init_display()
+        self.bl_ctrl(100)
         
     def write_cmd(self, cmd):
         self.cs(1)
@@ -54,13 +53,12 @@ class LCD_3inch5(framebuf.FrameBuffer):
         self.cs(1)
         self.dc(1)
         self.cs(0)
-        #self.spi.write(bytearray([0X00]))
         self.spi.write(bytearray([buf]))
         self.cs(1)
 
 
     def init_display(self):
-        """Initialize dispaly"""  
+        """Initialize display"""  
         self.rst(1)
         time.sleep_ms(5)
         self.rst(0)
@@ -122,6 +120,10 @@ class LCD_3inch5(framebuf.FrameBuffer):
         
         self.write_cmd(0x36)
         self.write_data(0x28)
+    
+    def draw_rect(self, rect):
+        self.rect_buffer.append(rect)
+        
     def show_up(self):
         self.write_cmd(0x2A)
         self.write_data(0x00)
@@ -142,6 +144,7 @@ class LCD_3inch5(framebuf.FrameBuffer):
         self.cs(0)
         self.spi.write(self.buffer)
         self.cs(1)
+
     def show_down(self):
         self.write_cmd(0x2A)
         self.write_data(0x00)
@@ -162,6 +165,23 @@ class LCD_3inch5(framebuf.FrameBuffer):
         self.cs(0)
         self.spi.write(self.buffer)
         self.cs(1)
+
+    def clear(self):
+        self.fill(self.bgcolour.get_binary())
+
+    def update(self):
+        self.clear()
+        for r in self.rect_buffer:
+            self.fill_rect(r.x, r.y, r.width, r.height, r.colour.get_binary())
+        self.show_up()
+
+        self.clear()
+        for r in self.rect_buffer:
+            self.fill_rect(r.x, r.y - self.height, r.width, r.height, r.colour.get_binary())
+        self.show_down()
+
+        self.rect_buffer = []
+
     def bl_ctrl(self,duty):
         pwm = PWM(Pin(LCD_BL))
         pwm.freq(1000)
@@ -169,53 +189,3 @@ class LCD_3inch5(framebuf.FrameBuffer):
             pwm.duty_u16(65535)
         else:
             pwm.duty_u16(655*duty)
-    def draw_point(self,x,y,color):
-        self.write_cmd(0x2A)
-
-        
-        self.write_data((x-2)>>8)
-        self.write_data((x-2)&0xff)
-        self.write_data(x>>8)
-        self.write_data(x&0xff)
-        
-        self.write_cmd(0x2B)
-        self.write_data((y-2)>>8)
-        self.write_data((y-2)&0xff)
-        self.write_data(y>>8)
-        self.write_data(y&0xff)
-        
-        self.write_cmd(0x2C)
-        
-        self.cs(1)
-        self.dc(1)
-        self.cs(0)
-        for i in range(0,9):
-            h_color = bytearray(color>>8)
-            l_color = bytearray(color&0xff)
-            self.spi.write(h_color)
-            self.spi.write(l_color)
-        self.cs(1)
-    def touch_get(self): 
-        if self.irq() == 0:
-            self.spi = SPI(1,5_000_000,sck=Pin(LCD_SCK),mosi=Pin(LCD_MOSI),miso=Pin(LCD_MISO))
-            self.tp_cs(0)
-            X_Point = 0
-            Y_Point = 0
-            for i in range(0,3):
-                self.spi.write(bytearray([0XD0]))
-                Read_date = self.spi.read(2)
-                time.sleep_us(10)
-                X_Point=X_Point+(((Read_date[0]<<8)+Read_date[1])>>3)
-                
-                self.spi.write(bytearray([0X90]))
-                Read_date = self.spi.read(2)
-                Y_Point=Y_Point+(((Read_date[0]<<8)+Read_date[1])>>3)
-
-            X_Point=X_Point/3
-            Y_Point=Y_Point/3
-            
-            self.tp_cs(1) 
-            self.spi = SPI(1,60_000_000,sck=Pin(LCD_SCK),mosi=Pin(LCD_MOSI),miso=Pin(LCD_MISO))
-            Result_list = [X_Point,Y_Point]
-            #print(Result_list)
-            return(Result_list)
