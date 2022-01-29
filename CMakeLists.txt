@@ -16,15 +16,23 @@ set(PROJECT_CONSOLE_PATH ${PROJECT_SOURCE_DIR})
 # Initialize the SDK
 pico_sdk_init()
 
-add_executable(ppu
-        ppu.c
-)
+if (TARGET tinyusb_device)
+        add_executable(ppu
+                ppu.c
+        )
 
-# pull in common dependencies
-target_link_libraries(ppu hardware_spi pico_stdlib)
+        # pull in common dependencies
+        target_link_libraries(ppu hardware_spi pico_stdlib)
 
-# create map/bin/hex file etc.
-pico_add_extra_outputs(ppu)
+        # enable usb output, disable uart output
+        pico_enable_stdio_usb(ppu 1)
+        pico_enable_stdio_uart(ppu 0)
+
+        # create map/bin/hex file etc.
+        pico_add_extra_outputs(ppu)
+elseif(PICO_ON_DEVICE)
+    message(WARNING "not building hello_usb because TinyUSB submodule is not initialized in the SDK")
+endif()
 
 add_compile_options(-Wall
         -Wno-format          # int != int32_t as far as the compiler is concerned because gcc has int32_t as long int
