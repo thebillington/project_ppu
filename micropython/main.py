@@ -2,28 +2,56 @@ from time import sleep
 from simulated_hardware import Device
 from colour import Colour
 from physics import Rectangle
+from random import randint
 
-device = Device(width=480, height=320, bgcolour=Colour(0x00))
+screen_width = 480
+screen_height = 320
+
+device = Device(width=screen_width, height=screen_height, bgcolour=Colour(0x00))
 
 paddle_one = Rectangle(10, 140, 5, 40, Colour(0x07))
 paddle_two = Rectangle(455, 140, 5, 40, Colour(0x07))
+ball = Rectangle(screen_width/2-2, screen_height/2-2, 4, 4, Colour(0x07))
+
+ball_y_vel = randint(-2,2)
+ball_direction = 1
+
+paddle_speed = 2
 
 while True:
 
     if device.is_pressed("w"):
-        paddle_one.y -= 1
+        if paddle_one.y > 0:
+            paddle_one.y -= paddle_speed
     if device.is_pressed("s"):
-        paddle_one.y += 1
+        if paddle_one.y + paddle_one.height < screen_height:
+            paddle_one.y += paddle_speed
 
     if device.is_pressed("Up"):
-        paddle_two.y -= 1
+        if paddle_two.y > 0:
+            paddle_two.y -= paddle_speed
     if device.is_pressed("Down"):
-        paddle_two.y += 1
+        if paddle_two.y + paddle_two.height < screen_height:
+            paddle_two.y += paddle_speed
+
+    if ball.has_collided(paddle_one) or ball.has_collided(paddle_two):
+        ball_direction *= -1
+        
+    if ball.y < 0:
+        ball.y = 0
+        ball_y_vel *= -1
+    if ball.y > screen_height - ball.height:
+        ball.y = screen_height - ball.height
+        ball_y_vel *= -1
+
+    ball.y += ball_y_vel
+    ball.x += 2 * ball_direction
     
     device.clear()
 
     device.renderRectangle(paddle_one)
     device.renderRectangle(paddle_two)
+    device.renderRectangle(ball)
 
     device.update()
 
