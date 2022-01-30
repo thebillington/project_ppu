@@ -3,6 +3,13 @@ from tkinter import Tk, Canvas
 from colour import Colour
 import keyboard
 
+key_mapping = {
+    "a":"a",
+    "b":"b",
+    "l":"Left",
+    "r":"Right"
+}
+
 class Device:
     def __init__(self, bgcolour=Colour(0x00)):
         self.screen = Screen(480, 320, bgcolour)
@@ -17,19 +24,20 @@ class Device:
         self.screen.draw_rect(rect)
     
     def is_pressed(self, k):
-        return keyboard.is_pressed(k)
+        return keyboard.is_pressed(key_mapping[k])
 
 class Screen:
     def __init__(self, width, height, bgcolour):
-        self.width = width
-        self.height = height
+        # Switch width and height because rotating isn't possible with tkinter window
+        self.width = height
+        self.height = width
         self.bgcolour = bgcolour
 
         self.window = Tk()
         self.canvas = Canvas(
             self.window,
-            width=width,
-            height=height,
+            width=height,
+            height=width,
             bg=bgcolour.get_hex(),
             highlightthickness=0
         )
@@ -38,10 +46,10 @@ class Screen:
     
     def draw_rect(self, rect):
         self.canvas.create_rectangle(
-            rect.x,
             rect.y,
-            rect.x + rect.width,
+            rect.x,
             rect.y + rect.height,
+            rect.x + rect.width,
             fill=rect.colour.get_hex(),
             outline=rect.colour.get_hex()
         )

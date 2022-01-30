@@ -1,5 +1,5 @@
 from time import sleep
-from hardware import Device
+from simulated_hardware import Device
 from colour import Colour
 from physics import Rectangle
 from random import randint
@@ -20,17 +20,17 @@ paddle_speed = 2
 
 while True:
 
-    if device.is_pressed("w"):
+    if device.is_pressed("b"):
         if paddle_one.y > 0:
             paddle_one.y -= paddle_speed
-    if device.is_pressed("s"):
+    if device.is_pressed("r"):
         if paddle_one.y + paddle_one.height < screen_height:
             paddle_one.y += paddle_speed
 
-    if device.is_pressed("Up"):
+    if device.is_pressed("a"):
         if paddle_two.y > 0:
             paddle_two.y -= paddle_speed
-    if device.is_pressed("Down"):
+    if device.is_pressed("l"):
         if paddle_two.y + paddle_two.height < screen_height:
             paddle_two.y += paddle_speed
 
