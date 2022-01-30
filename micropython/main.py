@@ -1,5 +1,5 @@
 from time import sleep
-from simulated_hardware import Device
+from hardware import Device
 from colour import Colour
 from physics import Rectangle
 from random import randint
@@ -9,7 +9,7 @@ screen_height = 320
 
 device = Device(bgcolour=Colour.BLACK)
 
-paddle_one = Rectangle(10, 140, 5, 40, Colour.WHITE)
+paddle_one = Rectangle(10, 140, 5, 40, Colour.RED)
 paddle_two = Rectangle(455, 140, 5, 40, Colour.WHITE)
 ball = Rectangle(int(screen_width/2)-2, int(screen_height/2)-2, 4, 4, Colour.WHITE)
 
@@ -48,6 +48,8 @@ while True:
     ball.x += 2 * ball_direction
     
     device.clear()
+
+    device.draw_text("Score: 0", 50, 50, Colour.WHITE)
 
     device.draw_rect(paddle_one)
     device.draw_rect(paddle_two)

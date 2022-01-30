@@ -13,6 +13,13 @@ LCD_RST  = 15
 TP_CS    = 16
 TP_IRQ   = 17
 
+class Text:
+    def __init__(self, t, x, y, colour):
+        self.t = t
+        self.x = x
+        self.y = y
+        self.colour = colour
+
 class Device(framebuf.FrameBuffer):
 
     buttons = {
@@ -42,6 +49,7 @@ class Device(framebuf.FrameBuffer):
         self.spi = SPI(1,60_000_000,sck=Pin(LCD_SCK),mosi=Pin(LCD_MOSI),miso=Pin(LCD_MISO))
 
         self.rect_buffer = []
+        self.text_buffer = []
               
         self.buffer = bytearray(self.height * self.width * 2)
         super().__init__(self.buffer, self.width, self.height, framebuf.RGB565)
@@ -82,7 +90,7 @@ class Device(framebuf.FrameBuffer):
         self.write_cmd(0xB1)
         self.write_data(0xB0)
         self.write_cmd(0x36)
-        self.write_data(0x28)
+        self.write_data(0x80)
         self.write_cmd(0XE0)
         self.write_data(0x00)
         self.write_data(0x13)
@@ -130,6 +138,9 @@ class Device(framebuf.FrameBuffer):
     
     def draw_rect(self, rect):
         self.rect_buffer.append(rect)
+
+    def draw_text(self, t, x, y, colour):
+        self.text_buffer.append(Text(t,x,y,colour.get_binary()))
         
     def show_up(self):
         self.write_cmd(0x2A)
@@ -180,14 +191,19 @@ class Device(framebuf.FrameBuffer):
         self.clear()
         for r in self.rect_buffer:
             self.fill_rect(r.x, r.y, r.width, r.height, r.colour.get_binary())
+        for t in self.text_buffer:
+            self.text(t.t, t.x, t.y, t.colour)
         self.show_up()
 
         self.clear()
         for r in self.rect_buffer:
             self.fill_rect(r.x, r.y - self.height, r.width, r.height, r.colour.get_binary())
+        for t in self.text_buffer:
+            self.text(t.t, t.x, t.y - self.height, t.colour)
         self.show_down()
 
         self.rect_buffer = []
+        self.text_buffer = []
 
     def is_pressed(self, key):
         return self.buttons[key].value()

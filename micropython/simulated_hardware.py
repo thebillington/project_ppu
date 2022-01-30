@@ -26,6 +26,9 @@ class Device:
     def is_pressed(self, k):
         return keyboard.is_pressed(key_mapping[k])
 
+    def draw_text(self, t, x, y, colour):
+        self.screen.draw_text(t, x, y, colour)
+
 class Screen:
     def __init__(self, width, height, bgcolour):
         # Switch width and height because rotating isn't possible with tkinter window
@@ -53,6 +56,9 @@ class Screen:
             fill=rect.colour.get_hex(),
             outline=rect.colour.get_hex()
         )
+
+    def draw_text(self, t, x, y, colour):
+        self.canvas.create_text(x, y, text=t, fill=colour.get_hex())
 
     def update(self):
         self.window.update()
