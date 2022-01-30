@@ -16,10 +16,10 @@ TP_IRQ   = 17
 class Device(framebuf.FrameBuffer):
 
     buttons = {
-        "b": Pin(26, Pin.IN),
-        "r": Pin(1, Pin.IN),
-        "a": Pin(28, Pin.IN),
-        "l": Pin(4, Pin.IN)
+        "l": Pin(26, Pin.IN),
+        "b": Pin(1, Pin.IN),
+        "r": Pin(28, Pin.IN),
+        "a": Pin(4, Pin.IN)
     }
 
     def __init__(self, bgcolour):

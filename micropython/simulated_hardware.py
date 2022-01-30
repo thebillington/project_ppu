@@ -2,6 +2,7 @@
 from tkinter import Tk, Canvas
 from colour import Colour
 import keyboard
+from time import sleep
 
 key_mapping = {
     "a":"a",
@@ -19,6 +20,7 @@ class Device:
 
     def update(self):
         self.screen.update()
+        sleep(1/60)
     
     def draw_rect(self, rect):
         self.screen.draw_rect(rect)
