@@ -1,5 +1,5 @@
 from time import sleep
-from simulated_hardware import Device
+from hardware import Device
 from colour import Colour
 from physics import Rectangle
 from random import randint
