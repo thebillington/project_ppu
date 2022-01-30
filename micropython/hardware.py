@@ -15,6 +15,13 @@ TP_IRQ   = 17
 
 class Device(framebuf.FrameBuffer):
 
+    buttons = {
+        "b": Pin(26, Pin.IN),
+        "r": Pin(1, Pin.IN),
+        "a": Pin(28, Pin.IN),
+        "l": Pin(4, Pin.IN)
+    }
+
     def __init__(self, bgcolour):
         self.bgcolour = bgcolour
 
@@ -181,6 +188,9 @@ class Device(framebuf.FrameBuffer):
         self.show_down()
 
         self.rect_buffer = []
+
+    def is_pressed(self, key):
+        return self.buttons[key].value()
 
     def bl_ctrl(self,duty):
         pwm = PWM(Pin(LCD_BL))

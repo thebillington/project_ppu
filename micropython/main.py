@@ -20,19 +20,19 @@ paddle_speed = 2
 
 while True:
 
-    # if device.is_pressed("w"):
-    #     if paddle_one.y > 0:
-    #         paddle_one.y -= paddle_speed
-    # if device.is_pressed("s"):
-    #     if paddle_one.y + paddle_one.height < screen_height:
-    #         paddle_one.y += paddle_speed
+    if device.is_pressed("w"):
+        if paddle_one.y > 0:
+            paddle_one.y -= paddle_speed
+    if device.is_pressed("s"):
+        if paddle_one.y + paddle_one.height < screen_height:
+            paddle_one.y += paddle_speed
 
-    # if device.is_pressed("Up"):
-    #     if paddle_two.y > 0:
-    #         paddle_two.y -= paddle_speed
-    # if device.is_pressed("Down"):
-    #     if paddle_two.y + paddle_two.height < screen_height:
-    #         paddle_two.y += paddle_speed
+    if device.is_pressed("Up"):
+        if paddle_two.y > 0:
+            paddle_two.y -= paddle_speed
+    if device.is_pressed("Down"):
+        if paddle_two.y + paddle_two.height < screen_height:
+            paddle_two.y += paddle_speed
 
     if ball.has_collided(paddle_one) or ball.has_collided(paddle_two):
         ball_direction *= -1
